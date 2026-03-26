@@ -1,23 +1,4 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import type { AccreditationStatus } from '../types/database';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-export function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(dateStr));
-}
-
-export function daysUntil(dateStr: string): number {
-  const diff = new Date(dateStr).getTime() - Date.now();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
+import type { AccreditationStatus } from '@/types/database';
 
 export const STATUS_LABELS: Record<AccreditationStatus, string> = {
   upcoming: 'Upcoming',

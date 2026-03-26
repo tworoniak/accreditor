@@ -1,17 +1,17 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { queryClient } from '@/lib/queryClient'
-import { AuthProvider } from '@/features/auth/AuthContext'
-import { AuthGuard } from '@/features/auth/AuthGuard'
-import { AppShell } from '@/components/layout/AppShell'
-import { LoginPage } from '@/features/auth/LoginPage'
-
-// Placeholder pages — we'll build these next
-const Dashboard  = () => <div className="p-8 text-gray-500">Dashboard coming soon</div>
-const Shows      = () => <div className="p-8 text-gray-500">Shows coming soon</div>
-const Contacts   = () => <div className="p-8 text-gray-500">Contacts coming soon</div>
-const Templates  = () => <div className="p-8 text-gray-500">Templates coming soon</div>
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from '@/lib/queryClient';
+import { AuthProvider } from '@/features/auth/AuthProvider';
+import { AuthGuard } from '@/features/auth/AuthGuard';
+import { AppShell } from '@/components/layout/AppShell';
+import { LoginPage } from '@/features/auth/LoginPage';
+// import { PipelinePage } from '@/features/requests/PipelinePage';
+import { ShowsPage } from '@/features/shows/ShowsPage';
+import { ShowDetailPage } from '@/features/shows/ShowDetailPage';
+import { ContactsPage } from '@/features/contacts/ContactsPage';
+import { TemplatesPage } from '@/features/templates/TemplatesPage';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
 
 export default function App() {
   return (
@@ -19,13 +19,15 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path='/login' element={<LoginPage />} />
             <Route element={<AuthGuard />}>
               <Route element={<AppShell />}>
-                <Route path="/"          element={<Dashboard />} />
-                <Route path="/shows"     element={<Shows />} />
-                <Route path="/contacts"  element={<Contacts />} />
-                <Route path="/templates" element={<Templates />} />
+                {/* <Route path='/' element={<PipelinePage />} /> */}
+                <Route path='/' element={<DashboardPage />} />
+                <Route path='/shows' element={<ShowsPage />} />
+                <Route path='/shows/:id' element={<ShowDetailPage />} />
+                <Route path='/contacts' element={<ContactsPage />} />
+                <Route path='/templates' element={<TemplatesPage />} />
               </Route>
             </Route>
           </Routes>
@@ -33,13 +35,5 @@ export default function App() {
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  )
+  );
 }
-```
-
----
-
-### `.env.local`
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key

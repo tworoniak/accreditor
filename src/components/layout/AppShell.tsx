@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Camera, Users, FileText, LayoutDashboard, LogOut } from 'lucide-react';
-import { useAuth } from '@/features/auth/AuthContext';
-import { cn } from '@/lib/utils';
+import { useAuth } from '@/features/auth/useAuth';
+import { cn } from '../../lib/utils';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
