@@ -72,18 +72,18 @@ export function Modal({
         aria-modal='true'
         aria-labelledby={titleId}
         className={cn(
-          'relative z-10 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl',
+          'relative z-10 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900',
           className,
         )}
       >
         <div className='mb-4 flex items-center justify-between'>
-          <h2 id={titleId} className='text-base font-semibold text-gray-900'>
+          <h2 id={titleId} className='text-base font-semibold text-gray-900 dark:text-gray-100'>
             {title}
           </h2>
           <button
             onClick={onClose}
             aria-label='Close'
-            className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+            className='rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300'
           >
             <X className='h-4 w-4' />
           </button>

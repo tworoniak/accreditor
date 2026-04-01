@@ -27,17 +27,17 @@ export function ContactsPage() {
   );
 
   return (
-    <div className='p-8'>
+    <div className='p-8 dark:bg-gray-950 min-h-full'>
       {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
           {deleteError}
         </div>
       )}
 
       <div className='mb-6 flex items-center justify-between'>
         <div>
-          <h1 className='text-xl font-semibold text-gray-900'>PR Contacts</h1>
-          <p className='text-sm text-gray-500'>{contacts.length} contacts</p>
+          <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>PR Contacts</h1>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>{contacts.length} contacts</p>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
@@ -53,7 +53,7 @@ export function ContactsPage() {
         placeholder='Search by name, company, email'
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className='mb-6 w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
+        className='mb-6 w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-brand-500/20'
       />
 
       {isLoading ? (
@@ -61,7 +61,7 @@ export function ContactsPage() {
           Loading
         </div>
       ) : filtered.length === 0 ? (
-        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400'>
+        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500'>
           {search
             ? 'No contacts match that search'
             : 'No contacts yet — add your first one'}
@@ -103,7 +103,7 @@ export function ContactsPage() {
         title='Delete contact'
       >
         <div className='space-y-4'>
-          <p className='text-sm text-gray-600'>
+          <p className='text-sm text-gray-600 dark:text-gray-400'>
             Are you sure you want to delete{' '}
             <span className='font-medium'>
               {contacts.find((c) => c.id === pendingDelete)?.name ?? 'this contact'}
@@ -113,7 +113,7 @@ export function ContactsPage() {
           <div className='flex justify-end gap-2'>
             <button
               onClick={() => setPendingDelete(null)}
-              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100'
+              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
             >
               Cancel
             </button>
@@ -144,26 +144,26 @@ interface CardProps {
 
 const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: CardProps) {
   return (
-    <div className='group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md'>
+    <div className='group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900'>
       <div className='mb-3 flex items-start justify-between'>
         <div>
-          <p className='font-semibold text-gray-900'>{contact.name}</p>
+          <p className='font-semibold text-gray-900 dark:text-gray-100'>{contact.name}</p>
           {contact.company && (
-            <p className='text-xs text-gray-400'>{contact.company}</p>
+            <p className='text-xs text-gray-400 dark:text-gray-500'>{contact.company}</p>
           )}
         </div>
         <div className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
           <button
             onClick={onEdit}
             aria-label='Edit contact'
-            className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
+            className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
             aria-label='Delete contact'
-            className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
+            className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30'
           >
             <Trash2 className='h-3.5 w-3.5' />
           </button>
@@ -172,7 +172,7 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
 
       <div className='space-y-1.5'>
         {contact.email && (
-          <div className='flex items-center gap-2 text-xs text-gray-500'>
+          <div className='flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400'>
             <Mail className='h-3.5 w-3.5 shrink-0' />
             <a
               href={'mailto:' + contact.email}
@@ -184,13 +184,13 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
           </div>
         )}
         {contact.phone && (
-          <div className='flex items-center gap-2 text-xs text-gray-500'>
+          <div className='flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400'>
             <Phone className='h-3.5 w-3.5 shrink-0' />
             {contact.phone}
           </div>
         )}
         {contact.company && (
-          <div className='flex items-center gap-2 text-xs text-gray-500'>
+          <div className='flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400'>
             <Building2 className='h-3.5 w-3.5 shrink-0' />
             {contact.company}
           </div>
@@ -198,7 +198,7 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
       </div>
 
       {contact.notes && (
-        <p className='mt-3 line-clamp-2 border-t border-gray-100 pt-3 text-xs text-gray-400'>
+        <p className='mt-3 line-clamp-2 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>
           {contact.notes}
         </p>
       )}

@@ -18,19 +18,19 @@ export function LoginPage() {
   }
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-gray-50'>
-      <div className='w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200'>
-        <h1 className='mb-1 text-xl font-semibold text-gray-900'>Accreditor</h1>
-        <p className='mb-6 text-sm text-gray-500'>Antihero Magazine</p>
+    <div className='flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950'>
+      <div className='w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700'>
+        <h1 className='mb-1 text-xl font-semibold text-gray-900 dark:text-gray-100'>Accreditor</h1>
+        <p className='mb-6 text-sm text-gray-500 dark:text-gray-400'>Antihero Magazine</p>
 
         {sent ? (
-          <p className='text-sm text-gray-600'>
+          <p className='text-sm text-gray-600 dark:text-gray-400'>
             Magic link sent — check your inbox.
           </p>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4'>
             <div>
-              <label className='mb-1 block text-sm font-medium text-gray-700'>
+              <label className='mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Email
               </label>
               <input
@@ -38,7 +38,7 @@ export function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
+                className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-brand-500/20'
                 placeholder='you@antiheromag.com'
               />
             </div>
