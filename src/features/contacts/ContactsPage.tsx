@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import { Plus, Mail, Phone, Building2, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check } from 'lucide-react';
 import { useContacts, useDeleteContact } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
 import { ContactForm } from './ContactForm';
@@ -55,6 +55,12 @@ export function ContactsPage() {
         onChange={(e) => setSearch(e.target.value)}
         className='mb-6 w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:ring-brand-500/20'
       />
+
+      <div aria-live='polite' className='sr-only'>
+        {!isLoading && debouncedSearch
+          ? `${filtered.length} contact${filtered.length !== 1 ? 's' : ''} found`
+          : ''}
+      </div>
 
       {isLoading ? (
         <div className='flex justify-center py-16 text-sm text-gray-400'>
@@ -143,6 +149,15 @@ interface CardProps {
 }
 
 const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: CardProps) {
+  const [copied, setCopied] = useState<'email' | 'phone' | null>(null);
+
+  function copyToClipboard(value: string, field: 'email' | 'phone') {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(field);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  }
+
   return (
     <div className='group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900'>
       <div className='mb-3 flex items-start justify-between'>
@@ -176,17 +191,31 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
             <Mail className='h-3.5 w-3.5 shrink-0' />
             <a
               href={'mailto:' + contact.email}
-              className='hover:text-brand-500'
+              className='min-w-0 truncate hover:text-brand-500'
               onClick={(e) => e.stopPropagation()}
             >
               {contact.email}
             </a>
+            <button
+              aria-label='Copy email'
+              onClick={(e) => { e.stopPropagation(); copyToClipboard(contact.email!, 'email'); }}
+              className='ml-auto shrink-0 rounded p-0.5 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400'
+            >
+              {copied === 'email' ? <Check className='h-3 w-3 text-emerald-500' /> : <Copy className='h-3 w-3' />}
+            </button>
           </div>
         )}
         {contact.phone && (
           <div className='flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400'>
             <Phone className='h-3.5 w-3.5 shrink-0' />
-            {contact.phone}
+            <span className='min-w-0 truncate'>{contact.phone}</span>
+            <button
+              aria-label='Copy phone'
+              onClick={(e) => { e.stopPropagation(); copyToClipboard(contact.phone!, 'phone'); }}
+              className='ml-auto shrink-0 rounded p-0.5 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400'
+            >
+              {copied === 'phone' ? <Check className='h-3 w-3 text-emerald-500' /> : <Copy className='h-3 w-3' />}
+            </button>
           </div>
         )}
         {contact.company && (

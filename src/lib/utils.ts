@@ -34,6 +34,20 @@ export const STATUS_LABELS: Record<AccreditationStatus, string> = {
   no_show: 'No Show',
 };
 
+export function buildMailtoLink(
+  email: string,
+  subject: string | null,
+  body: string,
+  vars: Record<string, string>,
+): string {
+  const fill = (tmpl: string) =>
+    tmpl.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? '');
+  const parts: string[] = [];
+  if (subject) parts.push('subject=' + encodeURIComponent(fill(subject)));
+  parts.push('body=' + encodeURIComponent(fill(body)));
+  return 'mailto:' + encodeURIComponent(email) + '?' + parts.join('&');
+}
+
 export const STATUS_COLORS: Record<AccreditationStatus, string> = {
   upcoming: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
   drafted: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
