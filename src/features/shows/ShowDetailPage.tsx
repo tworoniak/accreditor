@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -17,9 +17,8 @@ import {
   useUpdateRequest,
 } from '@/hooks/useRequests';
 import { Modal } from '@/components/ui/Modal';
-import { StatusBadge } from '@/components/ui/Badge';
 import { RequestForm } from './RequestForm';
-import { formatDate, daysUntil, STATUS_LABELS } from '@/lib/utils';
+import { cn, formatDate, daysUntil, STATUS_LABELS, STATUS_COLORS } from '@/lib/utils';
 import type {
   AccreditationRequest,
   AccreditationStatus,
@@ -53,6 +52,7 @@ export function ShowDetailPage() {
   const [restrictionText, setRestrictionText] = useState('');
   const [editingGallery, setEditingGallery] = useState<string | null>(null);
   const [galleryText, setGalleryText] = useState('');
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
   const show = shows.find((s) => s.id === id);
 
@@ -76,20 +76,28 @@ export function ShowDetailPage() {
 
   async function saveRestrictions() {
     if (!editingRestrictions) return;
-    await updateRequest.mutateAsync({
-      id: editingRestrictions,
-      pit_restrictions: restrictionText || null,
-    });
-    setEditingRestrictions(null);
+    try {
+      await updateRequest.mutateAsync({
+        id: editingRestrictions,
+        pit_restrictions: restrictionText || null,
+      });
+      setEditingRestrictions(null);
+    } catch (e) {
+      setMutationError(e instanceof Error ? e.message : 'Failed to save restrictions');
+    }
   }
 
   async function saveGallery() {
     if (!editingGallery) return;
-    await updateRequest.mutateAsync({
-      id: editingGallery,
-      gallery_url: galleryText || null,
-    });
-    setEditingGallery(null);
+    try {
+      await updateRequest.mutateAsync({
+        id: editingGallery,
+        gallery_url: galleryText || null,
+      });
+      setEditingGallery(null);
+    } catch (e) {
+      setMutationError(e instanceof Error ? e.message : 'Failed to save gallery link');
+    }
   }
 
   return (
@@ -134,6 +142,12 @@ export function ShowDetailPage() {
         </button>
       </div>
 
+      {mutationError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {mutationError}
+        </div>
+      )}
+
       {isLoading ? (
         <div className='flex justify-center py-16 text-sm text-gray-400'>
           Loading
@@ -149,7 +163,7 @@ export function ShowDetailPage() {
               key={req.id}
               request={req}
               onStatusChange={(status) =>
-                updateStatus.mutate({ id: req.id, status })
+                updateStatus.mutate({ id: req.id, status }, { onError: (e) => setMutationError(e instanceof Error ? e.message : 'Failed to update status') })
               }
               onEditRestrictions={() => openRestrictions(req)}
               onEditGallery={() => openGallery(req)}
@@ -236,7 +250,7 @@ interface RowProps {
   onEditGallery: () => void;
 }
 
-function RequestRow({
+const RequestRow = memo(function RequestRow({
   request,
   onStatusChange,
   onEditRestrictions,
@@ -327,14 +341,16 @@ function RequestRow({
             </button>
           )}
 
-          <div className='relative'>
-            <StatusBadge status={request.status} />
+          <div className='relative inline-flex items-center'>
             <select
               value={request.status}
               onChange={(e) =>
                 onStatusChange(e.target.value as AccreditationStatus)
               }
-              className='absolute inset-0 cursor-pointer opacity-0'
+              className={cn(
+                'cursor-pointer appearance-none rounded-full px-2.5 py-0.5 pr-6 text-xs font-medium outline-none',
+                STATUS_COLORS[request.status],
+              )}
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -342,7 +358,7 @@ function RequestRow({
                 </option>
               ))}
             </select>
-            <ChevronDown className='pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-current opacity-60' />
+            <ChevronDown className='pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 opacity-60' />
           </div>
         </div>
       </div>
@@ -358,4 +374,4 @@ function RequestRow({
       )}
     </div>
   );
-}
+});

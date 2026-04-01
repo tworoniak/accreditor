@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Plus, Mail, Phone, Building2, Pencil, Trash2 } from 'lucide-react';
 import { useContacts, useDeleteContact } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
@@ -11,15 +11,29 @@ export function ContactsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<PrContact | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 200);
+    return () => clearTimeout(t);
+  }, [search]);
 
   const filtered = contacts.filter((c) =>
     [c.name, c.company, c.email].some((v) =>
-      v?.toLowerCase().includes(search.toLowerCase()),
+      v?.toLowerCase().includes(debouncedSearch.toLowerCase()),
     ),
   );
 
   return (
     <div className='p-8'>
+      {deleteError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {deleteError}
+        </div>
+      )}
+
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900'>PR Contacts</h1>
@@ -59,7 +73,7 @@ export function ContactsPage() {
               key={contact.id}
               contact={contact}
               onEdit={() => setEditing(contact)}
-              onDelete={() => deleteContact.mutate(contact.id)}
+              onDelete={() => setPendingDelete(contact.id)}
             />
           ))}
         </div>
@@ -82,6 +96,42 @@ export function ContactsPage() {
           <ContactForm contact={editing} onSuccess={() => setEditing(null)} />
         )}
       </Modal>
+
+      <Modal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title='Delete contact'
+      >
+        <div className='space-y-4'>
+          <p className='text-sm text-gray-600'>
+            Are you sure you want to delete{' '}
+            <span className='font-medium'>
+              {contacts.find((c) => c.id === pendingDelete)?.name ?? 'this contact'}
+            </span>
+            ? This cannot be undone.
+          </p>
+          <div className='flex justify-end gap-2'>
+            <button
+              onClick={() => setPendingDelete(null)}
+              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100'
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                if (!pendingDelete) return;
+                deleteContact.mutate(pendingDelete, {
+                  onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete contact'),
+                });
+                setPendingDelete(null);
+              }}
+              className='rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600'
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
@@ -92,7 +142,7 @@ interface CardProps {
   onDelete: () => void;
 }
 
-function ContactCard({ contact, onEdit, onDelete }: CardProps) {
+const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: CardProps) {
   return (
     <div className='group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md'>
       <div className='mb-3 flex items-start justify-between'>
@@ -105,12 +155,14 @@ function ContactCard({ contact, onEdit, onDelete }: CardProps) {
         <div className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
           <button
             onClick={onEdit}
+            aria-label='Edit contact'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
+            aria-label='Delete contact'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
           >
             <Trash2 className='h-3.5 w-3.5' />
@@ -152,4 +204,4 @@ function ContactCard({ contact, onEdit, onDelete }: CardProps) {
       )}
     </div>
   );
-}
+});
