@@ -39,13 +39,13 @@ export function DashboardPage() {
   }
 
   return (
-    <div className='min-h-full bg-gray-50 p-8'>
+    <div className='min-h-full bg-gray-50 p-8 dark:bg-gray-950'>
       {/* Header */}
       <div className='mb-8'>
-        <h1 className='text-2xl font-semibold text-gray-900'>
+        <h1 className='text-2xl font-semibold text-gray-900 dark:text-gray-100'>
           {greeting}, {profile?.full_name?.split(' ')[0] ?? 'photographer'} 👋
         </h1>
-        <p className='mt-1 text-sm text-gray-500'>
+        <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
           Here's what's happening with your accreditations
         </p>
       </div>
@@ -84,8 +84,8 @@ export function DashboardPage() {
         {/* Left col: chart + top contacts */}
         <div className='space-y-6 lg:col-span-2'>
           {/* Monthly bar chart */}
-          <div className='rounded-2xl border border-gray-200 bg-white p-6'>
-            <h2 className='mb-4 text-sm font-semibold text-gray-700'>
+          <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900'>
+            <h2 className='mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300'>
               Activity — last 6 months
             </h2>
             <BarChart data={stats.byMonth} />
@@ -97,15 +97,15 @@ export function DashboardPage() {
               ].map(({ label, color }) => (
                 <div key={label} className='flex items-center gap-1.5'>
                   <div className={`h-2.5 w-2.5 rounded-sm ${color}`} />
-                  <span className='text-xs text-gray-500'>{label}</span>
+                  <span className='text-xs text-gray-500 dark:text-gray-400'>{label}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Status breakdown */}
-          <div className='rounded-2xl border border-gray-200 bg-white p-6'>
-            <h2 className='mb-4 text-sm font-semibold text-gray-700'>
+          <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900'>
+            <h2 className='mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300'>
               Breakdown by status
             </h2>
             <StatusBreakdown
@@ -116,9 +116,9 @@ export function DashboardPage() {
 
           {/* Top contacts */}
           {stats.topContacts.length > 0 && (
-            <div className='rounded-2xl border border-gray-200 bg-white p-6'>
+            <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900'>
               <div className='mb-4 flex items-center justify-between'>
-                <h2 className='text-sm font-semibold text-gray-700'>
+                <h2 className='text-sm font-semibold text-gray-700 dark:text-gray-300'>
                   Top PR contacts
                 </h2>
                 <button
@@ -135,21 +135,21 @@ export function DashboardPage() {
                     className='flex items-center justify-between'
                   >
                     <div>
-                      <p className='text-sm font-medium text-gray-800'>
+                      <p className='text-sm font-medium text-gray-800 dark:text-gray-200'>
                         {c.name}
                       </p>
                       {c.company && (
-                        <p className='text-xs text-gray-400'>{c.company}</p>
+                        <p className='text-xs text-gray-400 dark:text-gray-500'>{c.company}</p>
                       )}
                     </div>
                     <div className='text-right'>
-                      <p className='text-sm font-semibold text-gray-900'>
+                      <p className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
                         {c.total > 0
                           ? Math.round((c.granted / c.total) * 100)
                           : 0}
                         %
                       </p>
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-gray-400 dark:text-gray-500'>
                         {c.granted}/{c.total} approved
                       </p>
                     </div>
@@ -163,15 +163,15 @@ export function DashboardPage() {
         {/* Right col: deadlines + activity */}
         <div className='space-y-6'>
           {/* Upcoming deadlines */}
-          <div className='rounded-2xl border border-gray-200 bg-white p-6'>
+          <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900'>
             <div className='mb-4 flex items-center gap-2'>
               <AlertCircle className='h-4 w-4 text-amber-500' />
-              <h2 className='text-sm font-semibold text-gray-700'>
+              <h2 className='text-sm font-semibold text-gray-700 dark:text-gray-300'>
                 Deadlines this week
               </h2>
             </div>
             {stats.upcomingDeadlines.length === 0 ? (
-              <p className='text-xs text-gray-400'>
+              <p className='text-xs text-gray-400 dark:text-gray-500'>
                 No deadlines in the next 7 days
               </p>
             ) : (
@@ -181,13 +181,13 @@ export function DashboardPage() {
                   return (
                     <div
                       key={req.id}
-                      className='cursor-pointer rounded-lg border border-gray-100 p-3 hover:bg-gray-50'
+                      className='cursor-pointer rounded-lg border border-gray-100 p-3 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
                       onClick={() => navigate(`/shows/${req.show_id}`)}
                     >
-                      <p className='text-sm font-medium text-gray-800'>
+                      <p className='text-sm font-medium text-gray-800 dark:text-gray-200'>
                         {req.show?.artist}
                       </p>
-                      <p className='text-xs text-gray-400'>{req.show?.venue}</p>
+                      <p className='text-xs text-gray-400 dark:text-gray-500'>{req.show?.venue}</p>
                       <div
                         className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium
                         ${days <= 1 ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'}`}
@@ -203,9 +203,9 @@ export function DashboardPage() {
           </div>
 
           {/* Recent activity */}
-          <div className='rounded-2xl border border-gray-200 bg-white p-6'>
+          <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900'>
             <div className='mb-4 flex items-center justify-between'>
-              <h2 className='text-sm font-semibold text-gray-700'>
+              <h2 className='text-sm font-semibold text-gray-700 dark:text-gray-300'>
                 Recent activity
               </h2>
               <button
@@ -223,10 +223,10 @@ export function DashboardPage() {
                   onClick={() => navigate(`/shows/${req.show_id}`)}
                 >
                   <div className='min-w-0'>
-                    <p className='truncate text-sm font-medium text-gray-800'>
+                    <p className='truncate text-sm font-medium text-gray-800 dark:text-gray-200'>
                       {req.show?.artist}
                     </p>
-                    <p className='text-xs text-gray-400'>
+                    <p className='text-xs text-gray-400 dark:text-gray-500'>
                       {formatDate(req.updated_at)}
                     </p>
                   </div>
@@ -234,7 +234,7 @@ export function DashboardPage() {
                 </div>
               ))}
               {stats.recentActivity.length === 0 && (
-                <p className='text-xs text-gray-400'>No activity yet</p>
+                <p className='text-xs text-gray-400 dark:text-gray-500'>No activity yet</p>
               )}
             </div>
           </div>

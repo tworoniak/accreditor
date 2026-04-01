@@ -101,10 +101,10 @@ export function ShowDetailPage() {
   }
 
   return (
-    <div className='p-8'>
+    <div className='p-8 dark:bg-gray-950 min-h-full'>
       <button
         onClick={() => navigate('/shows')}
-        className='mb-6 flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700'
+        className='mb-6 flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200'
       >
         <ArrowLeft className='h-4 w-4' />
         Back to shows
@@ -112,10 +112,10 @@ export function ShowDetailPage() {
 
       <div className='mb-8 flex items-start justify-between'>
         <div>
-          <h1 className='text-2xl font-semibold text-gray-900'>
+          <h1 className='text-2xl font-semibold text-gray-900 dark:text-gray-100'>
             {show.artist}
           </h1>
-          <div className='mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500'>
+          <div className='mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400'>
             <span className='flex items-center gap-1.5'>
               <MapPin className='h-4 w-4' />
               {show.venue}, {show.city}
@@ -125,10 +125,10 @@ export function ShowDetailPage() {
               {formatDate(show.show_date)}
             </span>
             {show.promoter && (
-              <span className='text-gray-400'>Promoter: {show.promoter}</span>
+              <span className='text-gray-400 dark:text-gray-500'>Promoter: {show.promoter}</span>
             )}
             {show.tour_name && (
-              <span className='text-gray-400'>{show.tour_name}</span>
+              <span className='text-gray-400 dark:text-gray-500'>{show.tour_name}</span>
             )}
           </div>
         </div>
@@ -143,7 +143,7 @@ export function ShowDetailPage() {
       </div>
 
       {mutationError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
           {mutationError}
         </div>
       )}
@@ -153,7 +153,7 @@ export function ShowDetailPage() {
           Loading
         </div>
       ) : requests.length === 0 ? (
-        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400'>
+        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500'>
           No accreditation requests yet for this show
         </div>
       ) : (
@@ -190,13 +190,13 @@ export function ShowDetailPage() {
             value={restrictionText}
             onChange={(e) => setRestrictionText(e.target.value)}
             rows={4}
-            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
+            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-brand-500/20'
             placeholder='First 3 songs only, no flash, no 70-200mm'
           />
           <div className='flex justify-end gap-2'>
             <button
               onClick={() => setEditingRestrictions(null)}
-              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100'
+              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
             >
               Cancel
             </button>
@@ -220,13 +220,13 @@ export function ShowDetailPage() {
             type='url'
             value={galleryText}
             onChange={(e) => setGalleryText(e.target.value)}
-            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
+            className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-brand-500/20'
             placeholder='https://cloudinary.com/ or https://dropbox.com/'
           />
           <div className='flex justify-end gap-2'>
             <button
               onClick={() => setEditingGallery(null)}
-              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100'
+              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
             >
               Cancel
             </button>
@@ -262,28 +262,28 @@ const RequestRow = memo(function RequestRow({
   const isOverdue = days !== null && days < 0;
 
   return (
-    <div className='rounded-xl border border-gray-200 bg-white p-4'>
+    <div className='rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900'>
       <div className='flex flex-wrap items-start justify-between gap-4'>
         <div className='space-y-1.5'>
           {request.pr_contact ? (
-            <div className='flex items-center gap-1.5 text-sm font-medium text-gray-800'>
-              <User className='h-4 w-4 text-gray-400' />
+            <div className='flex items-center gap-1.5 text-sm font-medium text-gray-800 dark:text-gray-200'>
+              <User className='h-4 w-4 text-gray-400 dark:text-gray-500' />
               {request.pr_contact.name}
               {request.pr_contact.company && (
-                <span className='font-normal text-gray-400'>
+                <span className='font-normal text-gray-400 dark:text-gray-500'>
                   {' '}
                   - {request.pr_contact.company}
                 </span>
               )}
             </div>
           ) : (
-            <span className='text-sm text-gray-400'>
+            <span className='text-sm text-gray-400 dark:text-gray-500'>
               No PR contact assigned
             </span>
           )}
 
           {request.photographer && (
-            <div className='flex items-center gap-1.5 text-xs text-gray-400'>
+            <div className='flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500'>
               <div className='flex h-4 w-4 items-center justify-center rounded-full bg-brand-100 text-xs font-medium text-brand-600'>
                 {request.photographer.full_name?.[0] ?? '?'}
               </div>
@@ -310,14 +310,14 @@ const RequestRow = memo(function RequestRow({
           )}
 
           {request.notes && (
-            <p className='text-xs text-gray-400'>{request.notes}</p>
+            <p className='text-xs text-gray-400 dark:text-gray-500'>{request.notes}</p>
           )}
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
           <button
             onClick={onEditRestrictions}
-            className='rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50'
+            className='rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
           >
             {request.pit_restrictions ? 'Restrictions' : '+ Restrictions'}
           </button>
@@ -327,7 +327,7 @@ const RequestRow = memo(function RequestRow({
               href={request.gallery_url}
               target='_blank'
               rel='noopener noreferrer'
-              className='flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-brand-500 hover:bg-brand-50'
+              className='flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-brand-500 hover:bg-brand-50 dark:border-gray-600 dark:hover:bg-brand-900/20'
             >
               <ExternalLink className='h-3 w-3' />
               Gallery
@@ -335,7 +335,7 @@ const RequestRow = memo(function RequestRow({
           ) : (
             <button
               onClick={onEditGallery}
-              className='rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50'
+              className='rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
             >
               + Gallery link
             </button>
@@ -365,7 +365,7 @@ const RequestRow = memo(function RequestRow({
 
       {request.pit_restrictions && (
         <div
-          className='mt-3 cursor-pointer rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100'
+          className='mt-3 cursor-pointer rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-300 dark:hover:bg-amber-900/30'
           onClick={onEditRestrictions}
         >
           <span className='font-medium'>Pit rules:</span>{' '}

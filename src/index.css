@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@variant dark (&:is(.dark *));
+
 @theme {
   /* Brand */
   --color-brand-50: #f0f4ff;

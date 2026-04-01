@@ -14,19 +14,19 @@ export function TemplatesPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   return (
-    <div className='p-8'>
+    <div className='p-8 dark:bg-gray-950 min-h-full'>
       {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
           {deleteError}
         </div>
       )}
 
       <div className='mb-6 flex items-center justify-between'>
         <div>
-          <h1 className='text-xl font-semibold text-gray-900'>
+          <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>
             Request templates
           </h1>
-          <p className='text-sm text-gray-500'>{templates.length} templates</p>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>{templates.length} templates</p>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
@@ -42,7 +42,7 @@ export function TemplatesPage() {
           Loading…
         </div>
       ) : templates.length === 0 ? (
-        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400'>
+        <div className='rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500'>
           No templates yet — create your first pitch
         </div>
       ) : (
@@ -89,17 +89,17 @@ export function TemplatesPage() {
           <div className='space-y-3'>
             {previewing.subject && (
               <div>
-                <p className='mb-1 text-xs font-medium text-gray-500'>
+                <p className='mb-1 text-xs font-medium text-gray-500 dark:text-gray-400'>
                   Subject
                 </p>
-                <p className='rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700'>
+                <p className='rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200'>
                   {previewing.subject}
                 </p>
               </div>
             )}
             <div>
-              <p className='mb-1 text-xs font-medium text-gray-500'>Body</p>
-              <pre className='whitespace-pre-wrap rounded-lg bg-gray-50 px-3 py-2 font-sans text-sm text-gray-700'>
+              <p className='mb-1 text-xs font-medium text-gray-500 dark:text-gray-400'>Body</p>
+              <pre className='whitespace-pre-wrap rounded-lg bg-gray-50 px-3 py-2 font-sans text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200'>
                 {previewing.body}
               </pre>
             </div>
@@ -120,13 +120,13 @@ interface CardProps {
 function TemplateCard({ template, onEdit, onDelete, onPreview }: CardProps) {
   return (
     <div
-      className='group cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md'
+      className='group cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900'
       onClick={onPreview}
     >
       <div className='mb-3 flex items-start justify-between'>
         <div className='flex items-center gap-2'>
           <FileText className='h-4 w-4 shrink-0 text-brand-500' />
-          <p className='font-semibold text-gray-900'>{template.name}</p>
+          <p className='font-semibold text-gray-900 dark:text-gray-100'>{template.name}</p>
         </div>
         <div
           className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'
@@ -135,14 +135,14 @@ function TemplateCard({ template, onEdit, onDelete, onPreview }: CardProps) {
           <button
             onClick={onEdit}
             aria-label='Edit template'
-            className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
+            className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
             aria-label='Delete template'
-            className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
+            className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30'
           >
             <Trash2 className='h-3.5 w-3.5' />
           </button>
@@ -150,14 +150,14 @@ function TemplateCard({ template, onEdit, onDelete, onPreview }: CardProps) {
       </div>
 
       {template.subject && (
-        <p className='mb-2 truncate text-xs text-gray-500'>
+        <p className='mb-2 truncate text-xs text-gray-500 dark:text-gray-400'>
           {template.subject}
         </p>
       )}
 
-      <p className='line-clamp-3 text-xs text-gray-400'>{template.body}</p>
+      <p className='line-clamp-3 text-xs text-gray-400 dark:text-gray-500'>{template.body}</p>
 
-      <div className='mt-3 flex items-center gap-1 border-t border-gray-100 pt-3 text-xs text-gray-400'>
+      <div className='mt-3 flex items-center gap-1 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>
         <Copy className='h-3 w-3' />
         Click to preview
       </div>
