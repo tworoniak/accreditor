@@ -40,6 +40,8 @@ export function RequestForm({ showId, onSuccess }: Props) {
     resolver: zodResolver(schema),
   });
 
+  const minDeadline = new Date().toISOString().slice(0, 16);
+
   async function onSubmit(values: FormValues) {
     setSubmitError(null);
     try {
@@ -90,6 +92,7 @@ export function RequestForm({ showId, onSuccess }: Props) {
         <input
           {...register('submission_deadline')}
           type='datetime-local'
+          min={minDeadline}
           className={input}
         />
       </div>

@@ -11,8 +11,17 @@ import {
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useAuth } from '@/features/auth/useAuth';
 import { StatusBadge } from '@/components/ui/Badge';
-import { formatDate, daysUntil, STATUS_LABELS } from '@/lib/utils';
-import type { AccreditationStatus } from '@/types/database';
+import { formatDate, daysUntil } from '@/lib/utils';
+import { StatCard } from './StatCard';
+import { BarChart } from './BarChart';
+import { StatusBreakdown } from './StatusBreakdown';
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
 
 export function DashboardPage() {
   const { profile } = useAuth();
@@ -233,187 +242,4 @@ export function DashboardPage() {
       </div>
     </div>
   );
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-interface StatCardProps {
-  label: string;
-  value: string | number;
-  icon: React.ReactNode;
-  color: 'blue' | 'green' | 'amber' | 'purple';
-  sub?: string;
-}
-
-const COLOR_MAP = {
-  blue: { bg: 'bg-blue-50', icon: 'text-blue-500', val: 'text-blue-600' },
-  green: {
-    bg: 'bg-emerald-50',
-    icon: 'text-emerald-500',
-    val: 'text-emerald-600',
-  },
-  amber: { bg: 'bg-amber-50', icon: 'text-amber-500', val: 'text-amber-600' },
-  purple: {
-    bg: 'bg-purple-50',
-    icon: 'text-purple-500',
-    val: 'text-purple-600',
-  },
-};
-
-function StatCard({ label, value, icon, color, sub }: StatCardProps) {
-  const c = COLOR_MAP[color];
-  return (
-    <div className='rounded-2xl border border-gray-200 bg-white p-5'>
-      <div className={`mb-3 inline-flex rounded-xl p-2.5 ${c.bg}`}>
-        <span className={c.icon}>{icon}</span>
-      </div>
-      <p className={`text-2xl font-semibold ${c.val}`}>{value}</p>
-      <p className='mt-0.5 text-sm text-gray-500'>{label}</p>
-      {sub && <p className='mt-0.5 text-xs text-gray-400'>{sub}</p>}
-    </div>
-  );
-}
-
-interface BarChartProps {
-  data: {
-    month: string;
-    granted: number;
-    rejected: number;
-    submitted: number;
-  }[];
-}
-
-function BarChart({ data }: BarChartProps) {
-  const max = Math.max(
-    ...data.map((d) => d.granted + d.rejected + d.submitted),
-    1,
-  );
-
-  return (
-    <div className='flex items-end gap-2' style={{ height: 120 }}>
-      {data.map((d) => {
-        const total = d.granted + d.rejected + d.submitted;
-        const pct = (total / max) * 100;
-
-        return (
-          <div
-            key={d.month}
-            className='group flex flex-1 flex-col items-center gap-1'
-          >
-            <div
-              className='relative w-full overflow-hidden rounded-t-md'
-              style={{ height: `${Math.max(pct, 4)}%` }}
-              title={`${d.month}: ${d.granted} granted, ${d.rejected} rejected, ${d.submitted} submitted`}
-            >
-              {/* Stacked bars: submitted (bottom) → rejected → granted (top) */}
-              <div className='absolute bottom-0 left-0 right-0 flex flex-col-reverse overflow-hidden rounded-t-md'>
-                {d.submitted > 0 && (
-                  <div
-                    className='w-full bg-blue-200'
-                    style={{
-                      height: `${(d.submitted / Math.max(total, 1)) * 100}%`,
-                      minHeight: 4,
-                    }}
-                  />
-                )}
-                {d.rejected > 0 && (
-                  <div
-                    className='w-full bg-red-400'
-                    style={{
-                      height: `${(d.rejected / Math.max(total, 1)) * 100}%`,
-                      minHeight: 4,
-                    }}
-                  />
-                )}
-                {d.granted > 0 && (
-                  <div
-                    className='w-full bg-emerald-400'
-                    style={{
-                      height: `${(d.granted / Math.max(total, 1)) * 100}%`,
-                      minHeight: 4,
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-            <span className='text-xs text-gray-400'>{d.month}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-const STATUS_ORDER: AccreditationStatus[] = [
-  'shot',
-  'granted',
-  'submitted',
-  'awaiting_response',
-  'drafted',
-  'upcoming',
-  'waitlisted',
-  'rejected',
-  'no_show',
-];
-
-interface StatusBreakdownProps {
-  byStatus: Record<AccreditationStatus, number>;
-  total: number;
-}
-
-function StatusBreakdown({ byStatus, total }: StatusBreakdownProps) {
-  if (total === 0) {
-    return <p className='text-xs text-gray-400'>No requests yet</p>;
-  }
-
-  return (
-    <div className='space-y-2.5'>
-      {STATUS_ORDER.filter((s) => (byStatus[s] ?? 0) > 0).map((status) => {
-        const count = byStatus[status] ?? 0;
-        const pct = Math.round((count / total) * 100);
-
-        return (
-          <div key={status}>
-            <div className='mb-1 flex items-center justify-between'>
-              <span className='text-xs text-gray-600'>
-                {STATUS_LABELS[status]}
-              </span>
-              <span className='text-xs font-medium text-gray-700'>{count}</span>
-            </div>
-            <div className='h-1.5 overflow-hidden rounded-full bg-gray-100'>
-              <div
-                className='h-full rounded-full transition-all duration-500'
-                style={{
-                  width: `${pct}%`,
-                  backgroundColor: getStatusBarColor(status),
-                }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function getStatusBarColor(status: AccreditationStatus): string {
-  const map: Partial<Record<AccreditationStatus, string>> = {
-    shot: '#059669',
-    granted: '#10b981',
-    submitted: '#3b82f6',
-    awaiting_response: '#f59e0b',
-    drafted: '#8b5cf6',
-    upcoming: '#9ca3af',
-    waitlisted: '#f97316',
-    rejected: '#ef4444',
-    no_show: '#d1d5db',
-  };
-  return map[status] ?? '#9ca3af';
-}
-
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
 }

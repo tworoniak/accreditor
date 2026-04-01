@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -17,9 +17,8 @@ import {
   useUpdateRequest,
 } from '@/hooks/useRequests';
 import { Modal } from '@/components/ui/Modal';
-import { StatusBadge } from '@/components/ui/Badge';
 import { RequestForm } from './RequestForm';
-import { formatDate, daysUntil, STATUS_LABELS } from '@/lib/utils';
+import { cn, formatDate, daysUntil, STATUS_LABELS, STATUS_COLORS } from '@/lib/utils';
 import type {
   AccreditationRequest,
   AccreditationStatus,
@@ -251,7 +250,7 @@ interface RowProps {
   onEditGallery: () => void;
 }
 
-function RequestRow({
+const RequestRow = memo(function RequestRow({
   request,
   onStatusChange,
   onEditRestrictions,
@@ -342,14 +341,16 @@ function RequestRow({
             </button>
           )}
 
-          <div className='relative'>
-            <StatusBadge status={request.status} />
+          <div className='relative inline-flex items-center'>
             <select
               value={request.status}
               onChange={(e) =>
                 onStatusChange(e.target.value as AccreditationStatus)
               }
-              className='absolute inset-0 cursor-pointer opacity-0'
+              className={cn(
+                'cursor-pointer appearance-none rounded-full px-2.5 py-0.5 pr-6 text-xs font-medium outline-none',
+                STATUS_COLORS[request.status],
+              )}
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -357,7 +358,7 @@ function RequestRow({
                 </option>
               ))}
             </select>
-            <ChevronDown className='pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-current opacity-60' />
+            <ChevronDown className='pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 opacity-60' />
           </div>
         </div>
       </div>
@@ -373,4 +374,4 @@ function RequestRow({
       )}
     </div>
   );
-}
+});

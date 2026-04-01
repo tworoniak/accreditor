@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Calendar, MapPin, Trash2, Pencil } from 'lucide-react';
 import { useShows, useDeleteShow } from '@/hooks/useShows';
@@ -15,9 +15,16 @@ export function ShowsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Show | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
-  const upcoming = shows.filter((s) => new Date(s.show_date) >= new Date());
-  const past = shows.filter((s) => new Date(s.show_date) < new Date());
+  const upcoming = useMemo(
+    () => shows.filter((s) => new Date(s.show_date) >= new Date()),
+    [shows],
+  );
+  const past = useMemo(
+    () => shows.filter((s) => new Date(s.show_date) < new Date()),
+    [shows],
+  );
 
   return (
     <div className='p-8'>
@@ -54,7 +61,7 @@ export function ShowsPage() {
               title='Upcoming'
               shows={upcoming}
               onEdit={setEditing}
-              onDelete={(id) => deleteShow.mutate(id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show') })}
+              onDelete={(id) => setPendingDelete(id)}
               onOpen={(id) => navigate('/shows/' + id)}
             />
           )}
@@ -63,7 +70,7 @@ export function ShowsPage() {
               title='Past'
               shows={past}
               onEdit={setEditing}
-              onDelete={(id) => deleteShow.mutate(id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show') })}
+              onDelete={(id) => setPendingDelete(id)}
               onOpen={(id) => navigate('/shows/' + id)}
             />
           )}
@@ -91,6 +98,42 @@ export function ShowsPage() {
         {editing && (
           <ShowForm show={editing} onSuccess={() => setEditing(null)} />
         )}
+      </Modal>
+
+      <Modal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title='Delete show'
+      >
+        <div className='space-y-4'>
+          <p className='text-sm text-gray-600'>
+            Are you sure you want to delete{' '}
+            <span className='font-medium'>
+              {shows.find((s) => s.id === pendingDelete)?.artist ?? 'this show'}
+            </span>
+            ? This cannot be undone.
+          </p>
+          <div className='flex justify-end gap-2'>
+            <button
+              onClick={() => setPendingDelete(null)}
+              className='rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-100'
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                if (!pendingDelete) return;
+                deleteShow.mutate(pendingDelete, {
+                  onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show'),
+                });
+                setPendingDelete(null);
+              }}
+              className='rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600'
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
@@ -132,7 +175,7 @@ interface CardProps {
   onOpen: () => void;
 }
 
-function ShowCard({ show, onEdit, onDelete, onOpen }: CardProps) {
+const ShowCard = memo(function ShowCard({ show, onEdit, onDelete, onOpen }: CardProps) {
   return (
     <div
       className='group cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md'
@@ -179,4 +222,4 @@ function ShowCard({ show, onEdit, onDelete, onOpen }: CardProps) {
       )}
     </div>
   );
-}
+});
