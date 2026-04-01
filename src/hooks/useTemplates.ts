@@ -21,13 +21,22 @@ export function useTemplates() {
   return useQuery({ queryKey: ['templates'], queryFn: fetchTemplates });
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function interpolateTemplate(
   body: string,
   vars: Record<string, string>,
 ): string {
   return body.replace(
     /\{\{(\w+)\}\}/g,
-    (_, key) => vars[key] ?? '{{' + key + '}}',
+    (_, key) => vars[key] != null ? escapeHtml(vars[key]) : '{{' + key + '}}',
   );
 }
 
