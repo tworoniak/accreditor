@@ -11,6 +11,8 @@ import { ShowDetailPage } from '@/features/shows/ShowDetailPage';
 import { ContactsPage } from '@/features/contacts/ContactsPage';
 import { TemplatesPage } from '@/features/templates/TemplatesPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { BandsPage } from '@/features/bands/BandsPage';
+import { BandDetailPage } from '@/features/bands/BandDetailPage';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function App() {
@@ -25,6 +27,8 @@ export default function App() {
                 <Route path='/' element={<ErrorBoundary><DashboardPage /></ErrorBoundary>} />
                 <Route path='/shows' element={<ErrorBoundary><ShowsPage /></ErrorBoundary>} />
                 <Route path='/shows/:id' element={<ErrorBoundary><ShowDetailPage /></ErrorBoundary>} />
+                <Route path='/bands' element={<ErrorBoundary><BandsPage /></ErrorBoundary>} />
+                <Route path='/bands/:id' element={<ErrorBoundary><BandDetailPage /></ErrorBoundary>} />
                 <Route path='/contacts' element={<ErrorBoundary><ContactsPage /></ErrorBoundary>} />
                 <Route path='/templates' element={<ErrorBoundary><TemplatesPage /></ErrorBoundary>} />
               </Route>

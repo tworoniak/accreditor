@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Camera, Users, FileText, LayoutDashboard, LogOut, Sun, Moon } from 'lucide-react';
+import { Camera, Users, FileText, LayoutDashboard, LogOut, Sun, Moon, Music2 } from 'lucide-react';
 import { useAuth } from '@/features/auth/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '../../lib/utils';
@@ -7,6 +7,7 @@ import { cn } from '../../lib/utils';
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/shows', label: 'Shows', icon: Camera },
+  { to: '/bands', label: 'Bands', icon: Music2 },
   { to: '/contacts', label: 'PR Contacts', icon: Users },
   { to: '/templates', label: 'Templates', icon: FileText },
 ];

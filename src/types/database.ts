@@ -62,6 +62,22 @@ export interface RequestTemplate {
   updated_at: string;
 }
 
+export interface Band {
+  id: string;
+  organization_id: string;
+  name: string;
+  genre: string | null;
+  label: string | null;
+  website: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  pr_contacts?: PrContact[];
+  shows?: Show[];
+}
+
 export interface AccreditationRequest {
   id: string;
   organization_id: string;
