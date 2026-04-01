@@ -9,6 +9,7 @@ import {
   AlertCircle,
   ExternalLink,
   ChevronDown,
+  Mail,
 } from 'lucide-react';
 import { useShows } from '@/hooks/useShows';
 import {
@@ -16,12 +17,15 @@ import {
   useUpdateRequestStatus,
   useUpdateRequest,
 } from '@/hooks/useRequests';
+import { useTemplates } from '@/hooks/useTemplates';
 import { Modal } from '@/components/ui/Modal';
 import { RequestForm } from './RequestForm';
-import { cn, formatDate, daysUntil, STATUS_LABELS, STATUS_COLORS } from '@/lib/utils';
+import { cn, formatDate, daysUntil, STATUS_LABELS, STATUS_COLORS, buildMailtoLink } from '@/lib/utils';
 import type {
   AccreditationRequest,
   AccreditationStatus,
+  RequestTemplate,
+  Show,
 } from '@/types/database';
 
 const STATUSES: AccreditationStatus[] = [
@@ -42,6 +46,7 @@ export function ShowDetailPage() {
 
   const { data: shows = [] } = useShows();
   const { data: requests = [], isLoading } = useRequestsByShow(id!);
+  const { data: templates = [] } = useTemplates();
   const updateStatus = useUpdateRequestStatus();
   const updateRequest = useUpdateRequest();
 
@@ -158,10 +163,13 @@ export function ShowDetailPage() {
         </div>
       ) : (
         <div className='space-y-3'>
+          <div aria-live='polite' className='sr-only' />
           {requests.map((req) => (
             <RequestRow
               key={req.id}
               request={req}
+              show={show}
+              templates={templates}
               onStatusChange={(status) =>
                 updateStatus.mutate({ id: req.id, status }, { onError: (e) => setMutationError(e instanceof Error ? e.message : 'Failed to update status') })
               }
@@ -245,6 +253,8 @@ export function ShowDetailPage() {
 
 interface RowProps {
   request: AccreditationRequest;
+  show: Show;
+  templates: RequestTemplate[];
   onStatusChange: (status: AccreditationStatus) => void;
   onEditRestrictions: () => void;
   onEditGallery: () => void;
@@ -252,10 +262,22 @@ interface RowProps {
 
 const RequestRow = memo(function RequestRow({
   request,
+  show,
+  templates,
   onStatusChange,
   onEditRestrictions,
   onEditGallery,
 }: RowProps) {
+  const template = templates.find((t) => t.id === request.template_id);
+  const composeHref =
+    template && request.pr_contact?.email
+      ? buildMailtoLink(request.pr_contact.email, template.subject, template.body, {
+          artist: show.artist,
+          venue: show.venue,
+          city: show.city,
+          show_date: formatDate(show.show_date),
+        })
+      : null;
   const deadline = request.submission_deadline;
   const days = deadline ? daysUntil(deadline) : null;
   const isUrgent = days !== null && days <= 3 && days >= 0;
@@ -315,6 +337,17 @@ const RequestRow = memo(function RequestRow({
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
+          {composeHref && (
+            <a
+              href={composeHref}
+              aria-label='Compose email'
+              className='flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
+            >
+              <Mail className='h-3 w-3' />
+              Compose
+            </a>
+          )}
+
           <button
             onClick={onEditRestrictions}
             className='rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
