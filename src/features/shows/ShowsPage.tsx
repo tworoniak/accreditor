@@ -14,12 +14,19 @@ export function ShowsPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Show | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const upcoming = shows.filter((s) => new Date(s.show_date) >= new Date());
   const past = shows.filter((s) => new Date(s.show_date) < new Date());
 
   return (
     <div className='p-8'>
+      {deleteError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {deleteError}
+        </div>
+      )}
+
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900'>Shows</h1>
@@ -47,7 +54,7 @@ export function ShowsPage() {
               title='Upcoming'
               shows={upcoming}
               onEdit={setEditing}
-              onDelete={(id) => deleteShow.mutate(id)}
+              onDelete={(id) => deleteShow.mutate(id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show') })}
               onOpen={(id) => navigate('/shows/' + id)}
             />
           )}
@@ -56,7 +63,7 @@ export function ShowsPage() {
               title='Past'
               shows={past}
               onEdit={setEditing}
-              onDelete={(id) => deleteShow.mutate(id)}
+              onDelete={(id) => deleteShow.mutate(id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show') })}
               onOpen={(id) => navigate('/shows/' + id)}
             />
           )}
@@ -141,12 +148,14 @@ function ShowCard({ show, onEdit, onDelete, onOpen }: CardProps) {
         >
           <button
             onClick={onEdit}
+            aria-label='Edit show'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
+            aria-label='Delete show'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
           >
             <Trash2 className='h-3.5 w-3.5' />

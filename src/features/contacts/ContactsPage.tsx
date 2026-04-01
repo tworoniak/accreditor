@@ -11,6 +11,7 @@ export function ContactsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<PrContact | null>(null);
   const [search, setSearch] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const filtered = contacts.filter((c) =>
     [c.name, c.company, c.email].some((v) =>
@@ -20,6 +21,12 @@ export function ContactsPage() {
 
   return (
     <div className='p-8'>
+      {deleteError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {deleteError}
+        </div>
+      )}
+
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900'>PR Contacts</h1>
@@ -59,7 +66,7 @@ export function ContactsPage() {
               key={contact.id}
               contact={contact}
               onEdit={() => setEditing(contact)}
-              onDelete={() => deleteContact.mutate(contact.id)}
+              onDelete={() => deleteContact.mutate(contact.id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete contact') })}
             />
           ))}
         </div>
@@ -105,12 +112,14 @@ function ContactCard({ contact, onEdit, onDelete }: CardProps) {
         <div className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
           <button
             onClick={onEdit}
+            aria-label='Edit contact'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
+            aria-label='Delete contact'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
           >
             <Trash2 className='h-3.5 w-3.5' />

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,6 +31,7 @@ export function ShowForm({ show, onSuccess }: Props) {
   const { profile } = useAuth();
   const create = useCreateShow();
   const update = useUpdateShow();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -50,17 +52,22 @@ export function ShowForm({ show, onSuccess }: Props) {
   });
 
   async function onSubmit(values: FormValues) {
-    if (show) {
-      await update.mutateAsync({ id: show.id, ...values });
-    } else {
-      await create.mutateAsync({
-        ...values,
-        promoter: values.promoter || null,
-        tour_name: values.tour_name || null,
-        created_by: profile?.id ?? null,
-      });
+    setSubmitError(null);
+    try {
+      if (show) {
+        await update.mutateAsync({ id: show.id, ...values });
+      } else {
+        await create.mutateAsync({
+          ...values,
+          promoter: values.promoter || null,
+          tour_name: values.tour_name || null,
+          created_by: profile?.id ?? null,
+        });
+      }
+      onSuccess();
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
     }
-    onSuccess();
   }
 
   return (
@@ -117,6 +124,10 @@ export function ShowForm({ show, onSuccess }: Props) {
           />
         </div>
       </div>
+
+      {submitError && (
+        <p className='text-sm text-red-500'>{submitError}</p>
+      )}
 
       <div className='flex justify-end gap-2 pt-2'>
         <button

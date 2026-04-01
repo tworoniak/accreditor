@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,6 +31,7 @@ export function TemplateForm({ template, onSuccess }: Props) {
   const { profile } = useAuth();
   const create = useCreateTemplate();
   const update = useUpdateTemplate();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -47,18 +49,23 @@ export function TemplateForm({ template, onSuccess }: Props) {
   });
 
   async function onSubmit(values: FormValues) {
+    setSubmitError(null);
     const payload = {
       name: values.name,
       subject: values.subject || null,
       body: values.body,
       created_by: profile?.id ?? null,
     };
-    if (template) {
-      await update.mutateAsync({ id: template.id, ...payload });
-    } else {
-      await create.mutateAsync(payload);
+    try {
+      if (template) {
+        await update.mutateAsync({ id: template.id, ...payload });
+      } else {
+        await create.mutateAsync(payload);
+      }
+      onSuccess();
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
     }
-    onSuccess();
   }
 
   return (
@@ -95,6 +102,10 @@ export function TemplateForm({ template, onSuccess }: Props) {
           Available tokens: {TOKEN_HINT}
         </p>
       </div>
+
+      {submitError && (
+        <p className='text-sm text-red-500'>{submitError}</p>
+      )}
 
       <div className='flex justify-end pt-2'>
         <button

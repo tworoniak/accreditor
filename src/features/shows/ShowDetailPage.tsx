@@ -53,6 +53,7 @@ export function ShowDetailPage() {
   const [restrictionText, setRestrictionText] = useState('');
   const [editingGallery, setEditingGallery] = useState<string | null>(null);
   const [galleryText, setGalleryText] = useState('');
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
   const show = shows.find((s) => s.id === id);
 
@@ -76,20 +77,28 @@ export function ShowDetailPage() {
 
   async function saveRestrictions() {
     if (!editingRestrictions) return;
-    await updateRequest.mutateAsync({
-      id: editingRestrictions,
-      pit_restrictions: restrictionText || null,
-    });
-    setEditingRestrictions(null);
+    try {
+      await updateRequest.mutateAsync({
+        id: editingRestrictions,
+        pit_restrictions: restrictionText || null,
+      });
+      setEditingRestrictions(null);
+    } catch (e) {
+      setMutationError(e instanceof Error ? e.message : 'Failed to save restrictions');
+    }
   }
 
   async function saveGallery() {
     if (!editingGallery) return;
-    await updateRequest.mutateAsync({
-      id: editingGallery,
-      gallery_url: galleryText || null,
-    });
-    setEditingGallery(null);
+    try {
+      await updateRequest.mutateAsync({
+        id: editingGallery,
+        gallery_url: galleryText || null,
+      });
+      setEditingGallery(null);
+    } catch (e) {
+      setMutationError(e instanceof Error ? e.message : 'Failed to save gallery link');
+    }
   }
 
   return (
@@ -134,6 +143,12 @@ export function ShowDetailPage() {
         </button>
       </div>
 
+      {mutationError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {mutationError}
+        </div>
+      )}
+
       {isLoading ? (
         <div className='flex justify-center py-16 text-sm text-gray-400'>
           Loading
@@ -149,7 +164,7 @@ export function ShowDetailPage() {
               key={req.id}
               request={req}
               onStatusChange={(status) =>
-                updateStatus.mutate({ id: req.id, status })
+                updateStatus.mutate({ id: req.id, status }, { onError: (e) => setMutationError(e instanceof Error ? e.message : 'Failed to update status') })
               }
               onEditRestrictions={() => openRestrictions(req)}
               onEditGallery={() => openGallery(req)}

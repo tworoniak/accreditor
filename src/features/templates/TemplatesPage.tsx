@@ -11,9 +11,16 @@ export function TemplatesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<RequestTemplate | null>(null);
   const [previewing, setPreviewing] = useState<RequestTemplate | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   return (
     <div className='p-8'>
+      {deleteError && (
+        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
+          {deleteError}
+        </div>
+      )}
+
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900'>
@@ -45,7 +52,7 @@ export function TemplatesPage() {
               key={t.id}
               template={t}
               onEdit={() => setEditing(t)}
-              onDelete={() => deleteTemplate.mutate(t.id)}
+              onDelete={() => deleteTemplate.mutate(t.id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete template') })}
               onPreview={() => setPreviewing(t)}
             />
           ))}
@@ -127,12 +134,14 @@ function TemplateCard({ template, onEdit, onDelete, onPreview }: CardProps) {
         >
           <button
             onClick={onEdit}
+            aria-label='Edit template'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700'
           >
             <Pencil className='h-3.5 w-3.5' />
           </button>
           <button
             onClick={onDelete}
+            aria-label='Delete template'
             className='rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500'
           >
             <Trash2 className='h-3.5 w-3.5' />
