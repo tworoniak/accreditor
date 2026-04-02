@@ -51,6 +51,8 @@ export interface PrContact {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  // Joined fields
+  bands?: Band[];
 }
 
 export interface RequestTemplate {

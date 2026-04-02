@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import type { Band } from '@/types/database';
 
-type BandInsert = Omit<Band, 'id' | 'organization_id' | 'created_at' | 'updated_at' | 'pr_contacts' | 'shows'>;
+type BandInsert = Omit<Band, 'id' | 'created_at' | 'updated_at' | 'pr_contacts' | 'shows'>;
 type BandUpdate = Partial<BandInsert> & { id: string };
 
 async function fetchBands() {

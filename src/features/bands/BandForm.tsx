@@ -52,6 +52,7 @@ export function BandForm({ band, onSuccess }: Props) {
   async function onSubmit(values: FormValues) {
     setSubmitError(null);
     const payload = {
+      organization_id: profile!.organization_id,
       name: values.name,
       genre: values.genre || null,
       label: values.label || null,

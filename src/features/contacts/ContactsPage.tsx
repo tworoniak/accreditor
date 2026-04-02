@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check } from 'lucide-react';
+import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check, Music2 } from 'lucide-react';
 import { useContacts, useDeleteContact } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
 import { ContactForm } from './ContactForm';
@@ -225,6 +225,13 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
           </div>
         )}
       </div>
+
+      {(contact.bands?.length ?? 0) > 0 && (
+        <div className='mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>
+          <Music2 className='h-3.5 w-3.5' />
+          {contact.bands!.length} band{contact.bands!.length !== 1 ? 's' : ''}
+        </div>
+      )}
 
       {contact.notes && (
         <p className='mt-3 line-clamp-2 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>
