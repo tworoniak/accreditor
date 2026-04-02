@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { useCreateBand, useUpdateBand } from '@/hooks/useBands';
 import { useAuth } from '@/features/auth/useAuth';
 import type { Band } from '@/types/database';
@@ -30,7 +30,6 @@ export function BandForm({ band, onSuccess }: Props) {
   const { profile } = useAuth();
   const create = useCreateBand();
   const update = useUpdateBand();
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -50,7 +49,6 @@ export function BandForm({ band, onSuccess }: Props) {
   });
 
   async function onSubmit(values: FormValues) {
-    setSubmitError(null);
     const payload = {
       organization_id: profile!.organization_id,
       name: values.name,
@@ -63,12 +61,14 @@ export function BandForm({ band, onSuccess }: Props) {
     try {
       if (band) {
         await update.mutateAsync({ id: band.id, ...payload });
+        toast.success('Band updated');
       } else {
         await create.mutateAsync(payload);
+        toast.success('Band added');
       }
       onSuccess();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      toast.error(e instanceof Error ? e.message : 'Something went wrong');
     }
   }
 
@@ -111,8 +111,6 @@ export function BandForm({ band, onSuccess }: Props) {
           placeholder='Any notes about this band…'
         />
       </div>
-
-      {submitError && <p className='text-sm text-red-500'>{submitError}</p>}
 
       <div className='flex justify-end pt-2'>
         <button

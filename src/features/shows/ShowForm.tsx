@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { useCreateShow, useUpdateShow } from '@/hooks/useShows';
 import { useBands } from '@/hooks/useBands';
 import { useAuth } from '@/features/auth/useAuth';
@@ -33,7 +33,6 @@ export function ShowForm({ show, onSuccess }: Props) {
   const create = useCreateShow();
   const update = useUpdateShow();
   const { data: bands = [] } = useBands();
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -54,10 +53,10 @@ export function ShowForm({ show, onSuccess }: Props) {
   });
 
   async function onSubmit(values: FormValues) {
-    setSubmitError(null);
     try {
       if (show) {
         await update.mutateAsync({ id: show.id, ...values });
+        toast.success('Show updated');
       } else {
         await create.mutateAsync({
           ...values,
@@ -65,10 +64,11 @@ export function ShowForm({ show, onSuccess }: Props) {
           tour_name: values.tour_name || null,
           created_by: profile?.id ?? null,
         });
+        toast.success('Show added');
       }
       onSuccess();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      toast.error(e instanceof Error ? e.message : 'Something went wrong');
     }
   }
 
@@ -129,10 +129,6 @@ export function ShowForm({ show, onSuccess }: Props) {
           />
         </div>
       </div>
-
-      {submitError && (
-        <p className='text-sm text-red-500'>{submitError}</p>
-      )}
 
       <div className='flex justify-end gap-2 pt-2'>
         <button

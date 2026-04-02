@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Plus, X, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 import { useBand, useAddBandContact, useRemoveBandContact } from '@/hooks/useBands';
 import { useContacts } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
@@ -19,7 +20,6 @@ export function BandDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [addContactOpen, setAddContactOpen] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<PrContact | null>(null);
-  const [mutationError, setMutationError] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -84,12 +84,6 @@ export function BandDetailPage() {
           Edit band
         </button>
       </div>
-
-      {mutationError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {mutationError}
-        </div>
-      )}
 
       {band.notes && (
         <div className='mb-8 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-300'>
@@ -168,10 +162,8 @@ export function BandDetailPage() {
                 key={c.id}
                 onClick={() => {
                   addContact.mutate(c.id, {
-                    onError: (e) =>
-                      setMutationError(
-                        e instanceof Error ? e.message : 'Failed to add publicist',
-                      ),
+                    onSuccess: () => toast.success('Publicist added'),
+                    onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to add publicist'),
                   });
                   setAddContactOpen(false);
                 }}
@@ -212,10 +204,8 @@ export function BandDetailPage() {
               onClick={() => {
                 if (!pendingRemove) return;
                 removeContact.mutate(pendingRemove.id, {
-                  onError: (e) =>
-                    setMutationError(
-                      e instanceof Error ? e.message : 'Failed to remove publicist',
-                    ),
+                  onSuccess: () => toast.success('Publicist removed'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to remove publicist'),
                 });
                 setPendingRemove(null);
               }}

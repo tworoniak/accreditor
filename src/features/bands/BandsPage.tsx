@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Music2, Pencil, Trash2, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { useBands, useDeleteBand } from '@/hooks/useBands';
 import { Modal } from '@/components/ui/Modal';
 import { BandForm } from './BandForm';
@@ -14,7 +15,6 @@ export function BandsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Band | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Band | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -31,12 +31,6 @@ export function BandsPage() {
 
   return (
     <div className='p-8 dark:bg-gray-950 min-h-full'>
-      {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {deleteError}
-        </div>
-      )}
-
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>Bands</h1>
@@ -115,10 +109,8 @@ export function BandsPage() {
               onClick={() => {
                 if (!pendingDelete) return;
                 deleteBand.mutate(pendingDelete.id, {
-                  onError: (e) =>
-                    setDeleteError(
-                      e instanceof Error ? e.message : 'Failed to delete band',
-                    ),
+                  onSuccess: () => toast.success('Band deleted'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to delete band'),
                 });
                 setPendingDelete(null);
               }}

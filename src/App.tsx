@@ -14,11 +14,13 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { BandsPage } from '@/features/bands/BandsPage';
 import { BandDetailPage } from '@/features/bands/BandDetailPage';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { Toaster } from 'sonner';
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <Toaster richColors position='bottom-right' />
         <BrowserRouter>
           <Routes>
             <Route path='/login' element={<LoginPage />} />

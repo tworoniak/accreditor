@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { useCreateRequest } from '@/hooks/useRequests';
 import { useContacts } from '@/hooks/useContacts';
 import { useTemplates } from '@/hooks/useTemplates';
@@ -29,7 +29,6 @@ interface Props {
 export function RequestForm({ show, onSuccess }: Props) {
   const { profile } = useAuth();
   const createRequest = useCreateRequest();
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const { data: allContacts = [] } = useContacts();
   const { data: templates = [] } = useTemplates();
 
@@ -50,7 +49,6 @@ export function RequestForm({ show, onSuccess }: Props) {
   const minDeadline = new Date().toISOString().slice(0, 16);
 
   async function onSubmit(values: FormValues) {
-    setSubmitError(null);
     try {
       await createRequest.mutateAsync({
         show_id: show.id,
@@ -61,9 +59,10 @@ export function RequestForm({ show, onSuccess }: Props) {
         notes: values.notes || null,
         status: 'upcoming',
       });
+      toast.success('Request created');
       onSuccess();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      toast.error(e instanceof Error ? e.message : 'Something went wrong');
     }
   }
 
@@ -120,10 +119,6 @@ export function RequestForm({ show, onSuccess }: Props) {
           placeholder='Any relevant notes…'
         />
       </div>
-
-      {submitError && (
-        <p className='text-sm text-red-500'>{submitError}</p>
-      )}
 
       <div className='flex justify-end pt-2'>
         <button

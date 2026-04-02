@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { useCreateContact, useUpdateContact } from '@/hooks/useContacts';
 import { useBands } from '@/hooks/useBands';
@@ -34,7 +35,6 @@ export function ContactForm({ contact, onSuccess }: Props) {
   const update = useUpdateContact();
   const { data: allBands = [] } = useBands();
   const qc = useQueryClient();
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const originalBandIds = new Set((contact?.bands ?? []).map((b) => b.id));
   const [selectedBandIds, setSelectedBandIds] = useState<Set<string>>(
@@ -86,7 +86,6 @@ export function ContactForm({ contact, onSuccess }: Props) {
   }
 
   async function onSubmit(values: FormValues) {
-    setSubmitError(null);
     const payload = {
       name: values.name,
       email: values.email || null,
@@ -98,15 +97,17 @@ export function ContactForm({ contact, onSuccess }: Props) {
       if (contact) {
         await update.mutateAsync({ id: contact.id, ...payload });
         await applyBandChanges(contact.id);
+        toast.success('Contact updated');
       } else {
         const created = await create.mutateAsync(payload);
         if (selectedBandIds.size > 0) {
           await applyBandChanges(created.id);
         }
+        toast.success('Contact added');
       }
       onSuccess();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      toast.error(e instanceof Error ? e.message : 'Something went wrong');
     }
   }
 
@@ -205,10 +206,6 @@ export function ContactForm({ contact, onSuccess }: Props) {
             )}
           </div>
         </div>
-      )}
-
-      {submitError && (
-        <p className='text-sm text-red-500'>{submitError}</p>
       )}
 
       <div className='flex justify-end pt-2'>

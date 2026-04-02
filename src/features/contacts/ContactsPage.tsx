@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check, Music2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useContacts, useDeleteContact } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
 import { ContactForm } from './ContactForm';
@@ -12,7 +13,6 @@ export function ContactsPage() {
   const [editing, setEditing] = useState<PrContact | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,12 +28,6 @@ export function ContactsPage() {
 
   return (
     <div className='p-8 dark:bg-gray-950 min-h-full'>
-      {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {deleteError}
-        </div>
-      )}
-
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>PR Contacts</h1>
@@ -127,7 +121,8 @@ export function ContactsPage() {
               onClick={() => {
                 if (!pendingDelete) return;
                 deleteContact.mutate(pendingDelete, {
-                  onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete contact'),
+                  onSuccess: () => toast.success('Contact deleted'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to delete contact'),
                 });
                 setPendingDelete(null);
               }}
