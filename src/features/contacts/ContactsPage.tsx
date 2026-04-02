@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from 'react';
-import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check } from 'lucide-react';
+import { Plus, Mail, Phone, Building2, Pencil, Trash2, Copy, Check, Music2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useContacts, useDeleteContact } from '@/hooks/useContacts';
 import { Modal } from '@/components/ui/Modal';
 import { ContactForm } from './ContactForm';
@@ -12,7 +13,6 @@ export function ContactsPage() {
   const [editing, setEditing] = useState<PrContact | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,12 +28,6 @@ export function ContactsPage() {
 
   return (
     <div className='p-8 dark:bg-gray-950 min-h-full'>
-      {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {deleteError}
-        </div>
-      )}
-
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>PR Contacts</h1>
@@ -127,7 +121,8 @@ export function ContactsPage() {
               onClick={() => {
                 if (!pendingDelete) return;
                 deleteContact.mutate(pendingDelete, {
-                  onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete contact'),
+                  onSuccess: () => toast.success('Contact deleted'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to delete contact'),
                 });
                 setPendingDelete(null);
               }}
@@ -225,6 +220,13 @@ const ContactCard = memo(function ContactCard({ contact, onEdit, onDelete }: Car
           </div>
         )}
       </div>
+
+      {(contact.bands?.length ?? 0) > 0 && (
+        <div className='mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>
+          <Music2 className='h-3.5 w-3.5' />
+          {contact.bands!.length} band{contact.bands!.length !== 1 ? 's' : ''}
+        </div>
+      )}
 
       {contact.notes && (
         <p className='mt-3 line-clamp-2 border-t border-gray-100 pt-3 text-xs text-gray-400 dark:border-gray-700 dark:text-gray-500'>

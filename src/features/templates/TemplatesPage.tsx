@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, FileText, Pencil, Trash2, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 import { useTemplates, useDeleteTemplate } from '@/hooks/useTemplates';
 import { Modal } from '@/components/ui/Modal';
 import { TemplateForm } from './TemplateForm';
@@ -11,16 +12,9 @@ export function TemplatesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<RequestTemplate | null>(null);
   const [previewing, setPreviewing] = useState<RequestTemplate | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   return (
     <div className='p-8 dark:bg-gray-950 min-h-full'>
-      {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {deleteError}
-        </div>
-      )}
-
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>
@@ -52,7 +46,10 @@ export function TemplatesPage() {
               key={t.id}
               template={t}
               onEdit={() => setEditing(t)}
-              onDelete={() => deleteTemplate.mutate(t.id, { onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete template') })}
+              onDelete={() => deleteTemplate.mutate(t.id, {
+                onSuccess: () => toast.success('Template deleted'),
+                onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to delete template'),
+              })}
               onPreview={() => setPreviewing(t)}
             />
           ))}

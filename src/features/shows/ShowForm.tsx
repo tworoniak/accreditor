@@ -1,13 +1,14 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { useCreateShow, useUpdateShow } from '@/hooks/useShows';
+import { useBands } from '@/hooks/useBands';
 import { useAuth } from '@/features/auth/useAuth';
 import type { Show } from '@/types/database';
 
 const schema = z.object({
-  artist: z.string().min(1, 'Required'),
+  band_id: z.string().min(1, 'Required'),
   venue: z.string().min(1, 'Required'),
   city: z.string().min(1, 'Required'),
   show_date: z.string().min(1, 'Required'),
@@ -31,7 +32,7 @@ export function ShowForm({ show, onSuccess }: Props) {
   const { profile } = useAuth();
   const create = useCreateShow();
   const update = useUpdateShow();
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { data: bands = [] } = useBands();
 
   const {
     register,
@@ -41,7 +42,7 @@ export function ShowForm({ show, onSuccess }: Props) {
     resolver: zodResolver(schema),
     defaultValues: show
       ? {
-          artist: show.artist,
+          band_id: show.band_id,
           venue: show.venue,
           city: show.city,
           show_date: show.show_date,
@@ -52,10 +53,10 @@ export function ShowForm({ show, onSuccess }: Props) {
   });
 
   async function onSubmit(values: FormValues) {
-    setSubmitError(null);
     try {
       if (show) {
         await update.mutateAsync({ id: show.id, ...values });
+        toast.success('Show updated');
       } else {
         await create.mutateAsync({
           ...values,
@@ -63,10 +64,11 @@ export function ShowForm({ show, onSuccess }: Props) {
           tour_name: values.tour_name || null,
           created_by: profile?.id ?? null,
         });
+        toast.success('Show added');
       }
       onSuccess();
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      toast.error(e instanceof Error ? e.message : 'Something went wrong');
     }
   }
 
@@ -74,13 +76,16 @@ export function ShowForm({ show, onSuccess }: Props) {
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <div className='grid grid-cols-2 gap-4'>
         <div className='col-span-2'>
-          <label className={field}>Artist</label>
-          <input
-            {...register('artist')}
-            className={input}
-            placeholder='Meshuggah'
-          />
-          {errors.artist && <p className={err}>{errors.artist.message}</p>}
+          <label className={field}>Band</label>
+          <select {...register('band_id')} className={input}>
+            <option value=''>— Select band —</option>
+            {bands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+          {errors.band_id && <p className={err}>{errors.band_id.message}</p>}
         </div>
         <div>
           <label className={field}>Venue</label>
@@ -124,10 +129,6 @@ export function ShowForm({ show, onSuccess }: Props) {
           />
         </div>
       </div>
-
-      {submitError && (
-        <p className='text-sm text-red-500'>{submitError}</p>
-      )}
 
       <div className='flex justify-end gap-2 pt-2'>
         <button

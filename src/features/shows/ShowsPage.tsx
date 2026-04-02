@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Calendar, MapPin, Trash2, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 import { useShows, useDeleteShow } from '@/hooks/useShows';
 import { Modal } from '@/components/ui/Modal';
 import { ShowForm } from './ShowForm';
@@ -14,7 +15,6 @@ export function ShowsPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Show | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   const upcoming = useMemo(
@@ -28,12 +28,6 @@ export function ShowsPage() {
 
   return (
     <div className='p-8 dark:bg-gray-950 min-h-full'>
-      {deleteError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600'>
-          {deleteError}
-        </div>
-      )}
-
       <div className='mb-6 flex items-center justify-between'>
         <div>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>Shows</h1>
@@ -109,7 +103,7 @@ export function ShowsPage() {
           <p className='text-sm text-gray-600 dark:text-gray-400'>
             Are you sure you want to delete{' '}
             <span className='font-medium'>
-              {shows.find((s) => s.id === pendingDelete)?.artist ?? 'this show'}
+              {shows.find((s) => s.id === pendingDelete)?.band?.name ?? 'this show'}
             </span>
             ? This cannot be undone.
           </p>
@@ -124,7 +118,8 @@ export function ShowsPage() {
               onClick={() => {
                 if (!pendingDelete) return;
                 deleteShow.mutate(pendingDelete, {
-                  onError: (e) => setDeleteError(e instanceof Error ? e.message : 'Failed to delete show'),
+                  onSuccess: () => toast.success('Show deleted'),
+                  onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to delete show'),
                 });
                 setPendingDelete(null);
               }}
@@ -183,7 +178,7 @@ const ShowCard = memo(function ShowCard({ show, onEdit, onDelete, onOpen }: Card
     >
       <div className='mb-3 flex items-start justify-between'>
         <p className='font-semibold leading-tight text-gray-900 dark:text-gray-100'>
-          {show.artist}
+          {show.band?.name ?? '—'}
         </p>
         <div
           className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'

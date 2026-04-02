@@ -4,14 +4,14 @@ import type { PrContact } from '@/types/database';
 
 type ContactInsert = Omit<
   PrContact,
-  'id' | 'organization_id' | 'created_at' | 'updated_at'
+  'id' | 'organization_id' | 'created_at' | 'updated_at' | 'bands'
 >;
 type ContactUpdate = Partial<ContactInsert> & { id: string };
 
 async function fetchContacts() {
   const { data, error } = await supabase
     .from('pr_contacts')
-    .select('*')
+    .select('*, bands!band_pr_contacts(id, name)')
     .order('name', { ascending: true });
   if (error) throw error;
   return data as PrContact[];

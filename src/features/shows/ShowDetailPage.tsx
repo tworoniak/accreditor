@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Mail,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useShows } from '@/hooks/useShows';
 import {
   useRequestsByShow,
@@ -57,7 +58,6 @@ export function ShowDetailPage() {
   const [restrictionText, setRestrictionText] = useState('');
   const [editingGallery, setEditingGallery] = useState<string | null>(null);
   const [galleryText, setGalleryText] = useState('');
-  const [mutationError, setMutationError] = useState<string | null>(null);
 
   const show = shows.find((s) => s.id === id);
 
@@ -88,7 +88,7 @@ export function ShowDetailPage() {
       });
       setEditingRestrictions(null);
     } catch (e) {
-      setMutationError(e instanceof Error ? e.message : 'Failed to save restrictions');
+      toast.error(e instanceof Error ? e.message : 'Failed to save restrictions');
     }
   }
 
@@ -101,7 +101,7 @@ export function ShowDetailPage() {
       });
       setEditingGallery(null);
     } catch (e) {
-      setMutationError(e instanceof Error ? e.message : 'Failed to save gallery link');
+      toast.error(e instanceof Error ? e.message : 'Failed to save gallery link');
     }
   }
 
@@ -118,7 +118,7 @@ export function ShowDetailPage() {
       <div className='mb-8 flex items-start justify-between'>
         <div>
           <h1 className='text-2xl font-semibold text-gray-900 dark:text-gray-100'>
-            {show.artist}
+            {show.band?.name ?? '—'}
           </h1>
           <div className='mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400'>
             <span className='flex items-center gap-1.5'>
@@ -147,12 +147,6 @@ export function ShowDetailPage() {
         </button>
       </div>
 
-      {mutationError && (
-        <div className='mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400'>
-          {mutationError}
-        </div>
-      )}
-
       {isLoading ? (
         <div className='flex justify-center py-16 text-sm text-gray-400'>
           Loading
@@ -171,7 +165,7 @@ export function ShowDetailPage() {
               show={show}
               templates={templates}
               onStatusChange={(status) =>
-                updateStatus.mutate({ id: req.id, status }, { onError: (e) => setMutationError(e instanceof Error ? e.message : 'Failed to update status') })
+                updateStatus.mutate({ id: req.id, status }, { onError: (e) => toast.error(e instanceof Error ? e.message : 'Failed to update status') })
               }
               onEditRestrictions={() => openRestrictions(req)}
               onEditGallery={() => openGallery(req)}
@@ -185,7 +179,7 @@ export function ShowDetailPage() {
         onClose={() => setAddOpen(false)}
         title='New accreditation request'
       >
-        <RequestForm showId={show.id} onSuccess={() => setAddOpen(false)} />
+        <RequestForm show={show} onSuccess={() => setAddOpen(false)} />
       </Modal>
 
       <Modal
@@ -272,7 +266,7 @@ const RequestRow = memo(function RequestRow({
   const composeHref =
     template && request.pr_contact?.email
       ? buildMailtoLink(request.pr_contact.email, template.subject, template.body, {
-          artist: show.artist,
+          artist: show.band?.name ?? '',
           venue: show.venue,
           city: show.city,
           show_date: formatDate(show.show_date),
