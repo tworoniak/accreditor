@@ -28,7 +28,7 @@ async function fetchRequests() {
     .select(
       `
       *,
-      show:shows(*),
+      show:shows(*, band:bands(id, name)),
       pr_contact:pr_contacts(*),
       photographer:profiles(id, full_name, avatar_url)
     `,
@@ -51,7 +51,7 @@ export function useRequestsByShow(showId: string) {
         .select(
           `
           *,
-          show:shows(*),
+          show:shows(*, band:bands(id, name)),
           pr_contact:pr_contacts(*),
           photographer:profiles(id, full_name, avatar_url)
         `,

@@ -109,7 +109,7 @@ export function ShowsPage() {
           <p className='text-sm text-gray-600 dark:text-gray-400'>
             Are you sure you want to delete{' '}
             <span className='font-medium'>
-              {shows.find((s) => s.id === pendingDelete)?.artist ?? 'this show'}
+              {shows.find((s) => s.id === pendingDelete)?.band?.name ?? 'this show'}
             </span>
             ? This cannot be undone.
           </p>
@@ -183,7 +183,7 @@ const ShowCard = memo(function ShowCard({ show, onEdit, onDelete, onOpen }: Card
     >
       <div className='mb-3 flex items-start justify-between'>
         <p className='font-semibold leading-tight text-gray-900 dark:text-gray-100'>
-          {show.artist}
+          {show.band?.name ?? '—'}
         </p>
         <div
           className='flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'

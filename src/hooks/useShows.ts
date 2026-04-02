@@ -4,14 +4,14 @@ import type { Show } from '@/types/database';
 
 type ShowInsert = Omit<
   Show,
-  'id' | 'organization_id' | 'created_at' | 'updated_at'
+  'id' | 'organization_id' | 'created_at' | 'updated_at' | 'band'
 >;
 type ShowUpdate = Partial<ShowInsert> & { id: string };
 
 async function fetchShows() {
   const { data, error } = await supabase
     .from('shows')
-    .select('*')
+    .select('*, band:bands(id, name, pr_contacts!band_pr_contacts(*))')
     .order('show_date', { ascending: true });
   if (error) throw error;
   return data as Show[];

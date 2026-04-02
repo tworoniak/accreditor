@@ -28,7 +28,7 @@ export interface Profile {
 export interface Show {
   id: string;
   organization_id: string;
-  artist: string;
+  band_id: string;
   venue: string;
   city: string;
   show_date: string;
@@ -37,6 +37,8 @@ export interface Show {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  // Joined fields
+  band?: Band;
 }
 
 export interface PrContact {

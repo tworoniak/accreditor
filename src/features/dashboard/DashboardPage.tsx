@@ -185,7 +185,7 @@ export function DashboardPage() {
                       onClick={() => navigate(`/shows/${req.show_id}`)}
                     >
                       <p className='text-sm font-medium text-gray-800 dark:text-gray-200'>
-                        {req.show?.artist}
+                        {req.show?.band?.name ?? '—'}
                       </p>
                       <p className='text-xs text-gray-400 dark:text-gray-500'>{req.show?.venue}</p>
                       <div
@@ -224,7 +224,7 @@ export function DashboardPage() {
                 >
                   <div className='min-w-0'>
                     <p className='truncate text-sm font-medium text-gray-800 dark:text-gray-200'>
-                      {req.show?.artist}
+                      {req.show?.band?.name ?? '—'}
                     </p>
                     <p className='text-xs text-gray-400 dark:text-gray-500'>
                       {formatDate(req.updated_at)}

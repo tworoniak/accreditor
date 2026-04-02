@@ -6,6 +6,7 @@ import { useCreateRequest } from '@/hooks/useRequests';
 import { useContacts } from '@/hooks/useContacts';
 import { useTemplates } from '@/hooks/useTemplates';
 import { useAuth } from '@/features/auth/useAuth';
+import type { Show } from '@/types/database';
 
 const schema = z.object({
   pr_contact_id: z.string().optional(),
@@ -21,16 +22,21 @@ const input =
   'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-brand-500/20';
 
 interface Props {
-  showId: string;
+  show: Show;
   onSuccess: () => void;
 }
 
-export function RequestForm({ showId, onSuccess }: Props) {
+export function RequestForm({ show, onSuccess }: Props) {
   const { profile } = useAuth();
   const createRequest = useCreateRequest();
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { data: contacts = [] } = useContacts();
+  const { data: allContacts = [] } = useContacts();
   const { data: templates = [] } = useTemplates();
+
+  // Auto-fill: if band has publicists, scope and pre-select them
+  const bandContacts = show.band?.pr_contacts ?? [];
+  const contacts = bandContacts.length > 0 ? bandContacts : allContacts;
+  const defaultContactId = bandContacts.length > 0 ? bandContacts[0].id : undefined;
 
   const {
     register,
@@ -38,6 +44,7 @@ export function RequestForm({ showId, onSuccess }: Props) {
     formState: { isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    defaultValues: { pr_contact_id: defaultContactId },
   });
 
   const minDeadline = new Date().toISOString().slice(0, 16);
@@ -46,7 +53,7 @@ export function RequestForm({ showId, onSuccess }: Props) {
     setSubmitError(null);
     try {
       await createRequest.mutateAsync({
-        show_id: showId,
+        show_id: show.id,
         photographer_id: profile!.id,
         pr_contact_id: values.pr_contact_id || null,
         template_id: values.template_id || null,
@@ -63,7 +70,14 @@ export function RequestForm({ showId, onSuccess }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <div>
-        <label className={field}>PR contact</label>
+        <label className={field}>
+          PR contact
+          {bandContacts.length > 0 && (
+            <span className='ml-1.5 font-normal text-gray-400 dark:text-gray-500'>
+              (pre-filled from band)
+            </span>
+          )}
+        </label>
         <select {...register('pr_contact_id')} className={input}>
           <option value=''>— Select contact —</option>
           {contacts.map((c) => (
